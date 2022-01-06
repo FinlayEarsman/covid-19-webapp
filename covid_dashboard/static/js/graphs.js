@@ -226,8 +226,22 @@ function updateGraph(dataSet, timeFrame) {
 }
 
 function initiateGraphs(data) {
+  
+  //radio buttons
+  d3.select(("label[value='all']")).on("click", function() {
+      updateGraph(data, "all");
+  });
+  d3.select(("label[value='year']")).on("click", function() {
+      updateGraph(data, "year");
+  });
+  d3.select(("label[value='month']")).on("click", function() {
+      updateGraph(data, "month");
+  });
+  d3.select(("label[value='week']")).on("click", function() {
+      updateGraph(data, "week");
+  });
 
-    updateGraph(data, "all")
+  updateGraph(data, "all")
 }
 
 initiateGraphs(sample)

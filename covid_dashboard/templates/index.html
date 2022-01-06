@@ -9,6 +9,22 @@
 <h2>Africa Coronavirus Tracker</h2>
 <div id='container'>
     <h2>Cases</h2>
+    <div class=buttons>
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-secondary active" value="all">
+            <input type="radio" name="options" autocomplete="off" checked>All
+          </label>
+          <label class="btn btn-secondary" value="year">
+            <input type="radio" name="options" autocomplete="off">1y
+          </label>
+          <label class="btn btn-secondary" value="month">
+            <input type="radio" name="options" autocomplete="off">1m
+          </label>
+          <label class="btn btn-secondary" value="week">
+              <input type="radio" name="options" autocomplete="off">1w
+          </label>
+        </div>
+    </div>
     <svg id='cases'></svg>
 </div>
 

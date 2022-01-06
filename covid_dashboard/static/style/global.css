@@ -32,3 +32,8 @@ text {
   font-size: 12px;
   fill: black;
 }
+
+div.buttons {
+  float: left;
+  padding-left: 5%;
+}
