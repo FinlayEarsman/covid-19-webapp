@@ -1,6 +1,9 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from clickhouse_driver import Client
+import os
+import json
+from covid_dashboard.settings import STATIC_ROOT
 
 ch_client = Client("covid-database")
 
@@ -44,3 +47,17 @@ def get_summary_data(request):
     """)
     return JsonResponse(results, safe=False,
                         json_dumps_params={"default": str})
+
+def admin_page(request):
+    json_f = os.path.join(STATIC_ROOT, 'faqs.json')
+    loaded_json = json.load(open(json_f))
+    context = {'faqs':loaded_json}
+    return render(request, "admin-page.html", context)
+
+
+def update_faq(request):
+    updated_faq = {}
+    if request.method == "POST":
+        updated_faq["question"] = request.POST["question"]
+        updated_faq["answer"] = request.POST["answer"]
+    return JsonResponse(updated_faq)

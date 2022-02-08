@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_block %}
+    COVID-19 Africa Admin
+{% endblock %}
+
+{% block body_block %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+
+<h1>Welcome to the Admin Panel</h1>
+
+<div id="FAQs">
+    <table>
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for faq in faqs %}
+            <tr>
+                <td contenteditable='true' data-id="q-{{faq.question}}" data-old_value='{{faq.question}}'><p>{{ faq.question }}</p></td>
+                <td contenteditable='true' data-id="a-{{faq.question}}" data-old_value='{{faq.answer}}'><p>{{ faq.answer }}</p></td>
+                <td>
+                    <button value="{{ faq.question }}" onclick="updateQuestion('{{faq.question}}')">
+                        <p>Update</p>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function updateQuestion(question_name) {
+        const csrftoken = Cookies.get('csrftoken');
+        editedQuestion = $('[data-id=q-'+question_name+']')
+        editedAnswer = $('[data-id=a-'+question_name+']')
+
+        $.ajax({
+            headers: { "X-CSRFToken": '{{csrf_token}}' },
+            url: '{% url 'dashboard:update_faq' %}',
+            type: "POST",
+            dataType: "json",
+            data: {"question": editedQuestion.text(), "answer": editedAnswer.text()},
+            success: function(response) {
+                $(editedQuestion).attr('data-old_value', response.question);
+                $(editedAnswer).attr('data-old_value', response.answer);
+            }
+
+        });
+    }
+</script>
+
+{% endblock %}
