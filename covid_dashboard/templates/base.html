@@ -34,8 +34,8 @@
     <!-- load stylesheets -->
     <link rel="stylesheet" href="{% static 'style/nav.css' %}" />
     <link rel="stylesheet" href="{% static 'style/global.css' %}" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'style/dataTables-bootstrap5-min.css' %}">
+    <link rel="stylesheet" href="{% static 'style/twitter-bootstrap-5-0-1.css' %}">
 
     <!-- load fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
@@ -43,14 +43,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" crossorigin />
 
     <!-- load scripts -->
-    <script src = "https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src = "https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/no-data-to-display.js"></script>
-    <script src="https://code.highcharts.com/highcharts-more.js"></script>
-    <script src="https://code.highcharts.com/maps/modules/map.js"></script>
-    <script src="https://code.highcharts.com/mapdata/custom/africa.js"></script>
-    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="{% static 'javascript/jquery-3-5-1.js' %}"></script>
+    <script src="{% static 'javascript/highcharts.js' %}"></script>
+    <script src="{% static 'javascript/highcharts-no-data-to-display.js' %}"></script>
+    <script src="{% static 'javascript/highcharts-more.js' %}"></script>
+    <script src="{% static 'javascript/highcharts-maps-modules.js' %}"></script>
+    <script src="{% static 'javascript/highcharts-africa.js' %}"></script>
+    <script src="{% static 'javascript/jquery-dataTables-min.js' %}"></script>
+    <script src="{% static 'javascript/jquery-dataTables-bootstrap5-min.js' %}"></script>
 
 </head>
 <body>
