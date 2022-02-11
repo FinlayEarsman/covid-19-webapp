@@ -1,9 +1,8 @@
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from clickhouse_driver import Client
-import os
-import json
-from covid_dashboard.settings import STATIC_ROOT
+from dashboard.models import FAQModel
+from dashboard.forms import FAQForm
 
 ch_client = Client("covid-database")
 
@@ -48,16 +47,40 @@ def get_summary_data(request):
     return JsonResponse(results, safe=False,
                         json_dumps_params={"default": str})
 
+
+def populate_models():
+    faqs = [ {"question":"This is question 1...", "answer":"This is answer 1..."},
+        {"question":"This is question 2...", "answer":"This is answer 2..."}, 
+        {"question":"This is question 3...", "answer":"This is answer 3..."} ]
+
+    for faq in faqs:
+        f = FAQModel.objects.get_or_create(question=faq["question"])[0]
+        f.answer = faq["answer"]
+        f.save()
+
+
 def admin_page(request):
-    json_f = os.path.join(STATIC_ROOT, 'faqs.json')
-    loaded_json = json.load(open(json_f))
-    context = {'faqs':loaded_json}
+    # To initially generate FAQs to test edit functionality. 
+    # Call must be removed after first run.
+    # populate_models()
+
+    model_faqs = FAQModel.objects.all()
+    context = {'faqs': model_faqs}
     return render(request, "admin-page.html", context)
 
 
-def update_faq(request):
-    updated_faq = {}
-    if request.method == "POST":
-        updated_faq["question"] = request.POST["question"]
-        updated_faq["answer"] = request.POST["answer"]
-    return JsonResponse(updated_faq)
+def update_faq(request):    
+    try:
+        cur_faq = FAQModel.objects.get(slug=request.POST["slug"])
+    except FAQModel.DoesNotExist:
+        cur_faq = None
+
+    if cur_faq is None:
+        return redirect('/admin-page/')
+
+    updated_faq = {"question": request.POST["question"], "answer": request.POST["answer"]}
+    update_form = FAQForm(updated_faq, instance=cur_faq)
+    if update_form.is_valid():
+        new_faq = update_form.save(commit=True)
+        updated_faq["new_slug"] = new_faq.slug
+        return JsonResponse(updated_faq)

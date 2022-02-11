@@ -7,7 +7,6 @@
 
 {% block body_block %}
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
 <h1>Welcome to the Admin Panel</h1>
@@ -23,10 +22,10 @@
         <tbody>
             {% for faq in faqs %}
             <tr>
-                <td contenteditable='true' data-id="q-{{faq.question}}" data-old_value='{{faq.question}}'><p>{{ faq.question }}</p></td>
-                <td contenteditable='true' data-id="a-{{faq.question}}" data-old_value='{{faq.answer}}'><p>{{ faq.answer }}</p></td>
+                <td contenteditable='true' data-id="q-{{faq.slug}}"><p>{{ faq.question }}</p></td>
+                <td contenteditable='true' data-id="a-{{faq.slug}}"><p>{{ faq.answer }}</p></td>
                 <td>
-                    <button value="{{ faq.question }}" onclick="updateQuestion('{{faq.question}}')">
+                    <button value="{{ faq.question }}" defined_slug='{{faq.slug}}' onclick="updateQuestion(this)">
                         <p>Update</p>
                     </button>
                 </td>
@@ -37,22 +36,24 @@
 </div>
 
 <script>
-    function updateQuestion(question_name) {
+    function updateQuestion(question_to_update) {
+        relevant_faq = $(question_to_update);
+        slug_of_q = relevant_faq.attr('defined_slug');
         const csrftoken = Cookies.get('csrftoken');
-        editedQuestion = $('[data-id=q-'+question_name+']')
-        editedAnswer = $('[data-id=a-'+question_name+']')
+        editedQuestion = $('[data-id=q-'+slug_of_q+']')
+        editedAnswer = $('[data-id=a-'+slug_of_q+']')
 
         $.ajax({
             headers: { "X-CSRFToken": '{{csrf_token}}' },
-            url: '{% url 'dashboard:update_faq' %}',
-            type: "POST",
+            url: "{% url 'dashboard:update_faq' %}",
+            method: "POST",
             dataType: "json",
-            data: {"question": editedQuestion.text(), "answer": editedAnswer.text()},
+            data: {"question": editedQuestion.text(), "answer": editedAnswer.text(), "slug": slug_of_q},
             success: function(response) {
-                $(editedQuestion).attr('data-old_value', response.question);
-                $(editedAnswer).attr('data-old_value', response.answer);
+                $(editedQuestion).attr('data-id', "q-"+response.new_slug);
+                $(editedAnswer).attr('data-id', "a-"+response.new_slug);
+                $(relevant_faq).attr('defined_slug', response.new_slug);
             }
-
         });
     }
 </script>
