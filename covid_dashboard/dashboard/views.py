@@ -51,10 +51,20 @@ def get_summary_data(request):
 
 
 def populate_models():
-    faqs = [{"question": "This is question 1...", "answer":
-            "This is answer 1..."}, {"question": "This is question 2...",
-            "answer": "This is answer 2..."}, {"question":
-            "This is question 3...", "answer": "This is answer 3..."}]
+    faqs = [
+        {
+            "question": "This is question 1...",
+            "answer": "This is answer 1..."
+        },
+        {
+            "question": "This is question 2...",
+            "answer": "This is answer 2..."
+        },
+        {
+            "question": "This is question 3...",
+            "answer": "This is answer 3..."
+        }
+    ]
 
     for faq in faqs:
         f = FAQModel.objects.get_or_create(question=faq["question"])[0]
@@ -74,6 +84,10 @@ def admin_page(request):
 
 def update_faq(request):
     if request.method == 'POST':
+        if ("question" not in request.POST or
+                "answer" not in request.POST or
+                "slug" not in request.POST):
+            return HttpResponse(status=400)
         try:
             cur_faq = FAQModel.objects.get(slug=request.POST["slug"])
         except FAQModel.DoesNotExist:
