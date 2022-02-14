@@ -22,9 +22,9 @@ app_name = 'dashboard'
 urlpatterns = [
     # Index page URLS
     path('', views.index, name='index'),
-    path('covid_data', views.get_covid_data, name='get_covid_data'),
-    path('summary_data', views.get_summary_data, name='get_summary_data'),
+    path('covid_data/', views.get_covid_data, name='get_covid_data'),
+    path('summary_data/', views.get_summary_data, name='get_summary_data'),
     # Admin page URLS
     path('admin-page/', views.admin_page, name='admin_page'),
-    path('update_faq', views.update_faq, name='update_faq'),
+    path('update_faq/', views.update_faq, name='update_faq'),
 ]
