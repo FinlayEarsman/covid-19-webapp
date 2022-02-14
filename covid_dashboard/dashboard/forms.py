@@ -1,6 +1,7 @@
 from django import forms
 from dashboard.models import FAQModel
 
+
 class FAQForm(forms.ModelForm):
     MAX_INPUT_LENGTH = 400
 

@@ -1,8 +1,10 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from clickhouse_driver import Client
 from dashboard.models import FAQModel
 from dashboard.forms import FAQForm
+from django.http import HttpResponse
 
 ch_client = Client("covid-database")
 
@@ -49,9 +51,10 @@ def get_summary_data(request):
 
 
 def populate_models():
-    faqs = [ {"question":"This is question 1...", "answer":"This is answer 1..."},
-        {"question":"This is question 2...", "answer":"This is answer 2..."}, 
-        {"question":"This is question 3...", "answer":"This is answer 3..."} ]
+    faqs = [{"question": "This is question 1...", "answer":
+            "This is answer 1..."}, {"question": "This is question 2...",
+            "answer": "This is answer 2..."}, {"question":
+            "This is question 3...", "answer": "This is answer 3..."}]
 
     for faq in faqs:
         f = FAQModel.objects.get_or_create(question=faq["question"])[0]
@@ -60,7 +63,7 @@ def populate_models():
 
 
 def admin_page(request):
-    # To initially generate FAQs to test edit functionality. 
+    # To initially generate FAQs to test edit functionality.
     # Call must be removed after first run.
     # populate_models()
 
@@ -69,18 +72,19 @@ def admin_page(request):
     return render(request, "admin-page.html", context)
 
 
-def update_faq(request):    
-    try:
-        cur_faq = FAQModel.objects.get(slug=request.POST["slug"])
-    except FAQModel.DoesNotExist:
-        cur_faq = None
+def update_faq(request):
+    if request.method == 'POST':
+        try:
+            cur_faq = FAQModel.objects.get(slug=request.POST["slug"])
+        except FAQModel.DoesNotExist:
+            return redirect(reverse('admin-page'))
 
-    if cur_faq is None:
-        return redirect('/admin-page/')
+        updated_faq = {"question": request.POST["question"],
+                       "answer": request.POST["answer"]}
+        update_form = FAQForm(updated_faq, instance=cur_faq)
+        if update_form.is_valid():
+            new_faq = update_form.save(commit=True)
+            updated_faq["new_slug"] = new_faq.slug
+            return JsonResponse(updated_faq)
 
-    updated_faq = {"question": request.POST["question"], "answer": request.POST["answer"]}
-    update_form = FAQForm(updated_faq, instance=cur_faq)
-    if update_form.is_valid():
-        new_faq = update_form.save(commit=True)
-        updated_faq["new_slug"] = new_faq.slug
-        return JsonResponse(updated_faq)
+    return HttpResponse(status=400)

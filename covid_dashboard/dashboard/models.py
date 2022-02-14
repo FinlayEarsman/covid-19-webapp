@@ -1,6 +1,7 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 
+
 class FAQModel(models.Model):
     MAX_FIELD_LENGTH = 400
 
