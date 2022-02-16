@@ -29,6 +29,20 @@
                 </td>
             </tr>
             {% endfor %}
+            <tr>
+                <form id="faq_form" method="post" action="{% url 'dashboard:add_faq' %}", enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form.visible_fields %}
+                        {{ field.errors }}
+                        <td>{{ field }}</td>
+                    {% endfor %}
+                    <td>
+                        <button type="submit" name="submit">
+                            <p>Add</p>
+                        </button>
+                    </td>
+                </form>
+            </tr>
         </tbody>
     </table>
 </div>

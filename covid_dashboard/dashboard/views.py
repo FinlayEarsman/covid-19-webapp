@@ -77,9 +77,22 @@ def admin_page(request):
     # Call must be removed after first run.
     # populate_models()
 
+    form = FAQForm()
     model_faqs = FAQModel.objects.all()
-    context = {'faqs': model_faqs}
+    context = {'faqs': model_faqs, 'form': form}
     return render(request, "admin-page.html", context)
+
+
+def add_faq(request):
+    if request.method == 'POST':
+        form = FAQForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            form.save(commit=True)
+        else:
+            print(form.errors)
+
+    return redirect(reverse('dashboard:admin_page'))
 
 
 def update_faq(request):
