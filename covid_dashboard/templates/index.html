@@ -78,100 +78,51 @@ const request = fetch(dataRequest, {
     }
 );
 
-function draw_map(content) {
+     google.charts.load('current', {
+        'packages':['geochart'],
+        'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+      });
+      google.charts.setOnLoadCallback(drawRegionsMap);
 
-    var location_cases = {}
+      function drawRegionsMap() {
+        var data = google.visualization.arrayToDataTable([
 
-    content.forEach((row) => {
-        var location_ = row[0];
-        var n_cases = row[2];
 
-        var cur_location = location_cases[location_];
-        if (cur_location === undefined) {
-            location_cases[location_] = {
-                name: location_,
-                data: [n_cases],
-            };
-        } else {
-            cur_location.data.push(n_cases)
-        }
-    });
+         ['Country',   'Covid Cases in a day','Deaths in a Day'],
+          ['Algeria', 526,23], ['Angola', 8,1], ['Benin', 6,0], ['Botswana', 0,0],
+          ['Burkina Faso', 11,1], ['Burundi', 19,0], ['Cameroon', 3,0],
+          ['Canary Islands', 18,1], ['Cape Verde', 22,1],
+          ['Central African Republic', 33,2], ['Ceuta', 35,0], ['Chad', 14,0],
+          ['Comoros', 27,0], ['Cote d\'Ivoire', 16,0],
+          ['Democratic Republic of the Congo', 3,3], ['Djibouti', 12,3],
+          ['Egypt', 126,4], ['Equatorial Guinea', 13,0], ['Eritrea', 5,0],
+          ['Ethiopia', 99,2], ['Gabon', 0,0], ['Gambia', 13,1], ['Ghana', 15,0],
+          ['Guinea', 16,0], ['Guinea-Bissau', 12,0], ['Kenya', 37,3],
+          ['Lesotho', 4,0], ['Liberia', 6,0], ['Libya', 44,1], ['Madagascar', 0,0],
+          ['Madeira', 3,0], ['Malawi', 14,0], ['Mali', 12,0], ['Mauritania', 18,0],
+          ['Mauritius', 0,0], ['Mayotte', 2,0], ['Melilla', 0,0],
+          ['Morocco', 634,12], ['Mozambique', 50,0], ['Namibia', 0,0],
+          ['Niger', 4,0], ['Nigeria', 38,3], ['Republic of the Congo', 14,1],
+          ['Réunion', 0,0], ['Rwanda', 5,0], ['Saint Helena', 6,0],
+          ['São Tomé and Principe', 0,0], ['Senegal', 42,3],
+          ['Seychelles', 265,4], ['Sierra Leone', 4,0], ['Somalia', 2,0],
+          ['Sudan', 13,0], ['South Africa', 1649,41], ['South Sudan', 5,0],
+          ['Swaziland', 16,0], ['Tanzania', 206,2], ['Togo', 16,3], ['Tunisia', 34,3],
+          ['Uganda', 59,0], ['Western Sahara', 23,0], ['Zambia', 209,4],
+          ['Zimbabwe', 82,0]
+        ]);
 
-    // Dictionary from Highcharts hc-key mappings from country names
-    var convert = {'Uganda':'ug', 'Nigeria':'ng',
-        'Sao Tome and Principe':'st', 'Tanzania':'tz', 'Sierra Leone':'sl',
-        'Guinea-Bissau':'gw', 'Cape Verde':'cv', 'Seychelles':'sc',
-        'Tunisia':'tn', 'Madagascar':'mg', 'Kenya':'ke',
-        'Democratic Republic of Congo':'cd', 'France':'fr', 'Mauritania':'mr',
-        'Algeria':'dz', 'Eritrea':'er', 'Equatorial Guinea':'gq',
-        'Mauritius':'mu', 'Senegal':'sn', 'Comoros':'km',
-        'Ethiopia':'et', 'Cote d\'Ivoire':'ci', 'Ghana':'gh',
-        'Zambia':'zm', 'Namibia':'na', 'Rwanda':'rw',
-        'Somaliland':'sx', 'Somalia':'so', 'Cameroon':'cm',
-        'Congo':'cg', 'Western Sahara':'eh', 'Benin':'bj',
-        'Burkina Faso':'bf', 'Togo':'tg', 'Niger':'ne',
-        'Libya':'ly', 'Liberia':'lr', 'Malawi':'mw',
-        'Gambia':'gm', 'Chad':'td', 'Gabon':'ga',
-        'Djibouti':'dj', 'Burundi':'bi', 'Angola':'ao',
-        'Guinea':'gn', 'Zimbabwe':'zw', 'South Africa':'za',
-        'Mozambique':'mz', 'Eswatini':'sz', 'Mali':'ml',
-        'Botswana':'bw', 'Sudan':'sd', 'Morocco':'ma',
-        'Egypt':'eg', 'Lesotho':'ls', 'South Sudan':'ss',
-        'Central African Republic':'cf'
-    }
+		var options = {
+          region: '002', 
+          colorAxis: {colors: ['#397D02', '#FFBF00', '#D0312D']},
+          backgroundColor: '#ffffff',
+          datalessRegionColor: '#fffff',
+          defaultColor: '#397D02',
+        };
 
-    var map_arr = []
-    for (var key in location_cases) {
-        var hc_key = convert[key];
-        if (hc_key != undefined) {
-            var country = location_cases[key];
-            // For seeing all cases on map
-            var summed_cases = country.data.reduce((a, b) => a+b, 0);
-            // Finding cases in most recent week
-            var all_cases_arr = country.data;
-            var recent_week_cases = all_cases_arr[all_cases_arr.length-1];
-
-            if (recent_week_cases > 0 && recent_week_cases != null) {
-                map_arr.push([hc_key, recent_week_cases]);
-            } else {
-                map_arr.push([hc_key, 0]);
-            }
-        }
-    }
-
-    Highcharts.mapChart('choropleth', {
-        chart: {
-            map: 'custom/africa',
-            height: (9/16*100)+'%'
-        },
-
-        title: {
-            text: 'Interactive Map'
-        },
-
-        /* For when data is normalised
-        colorAxis: {
-            minColor: '#80ff80',
-            maxColor: '#ff8080'
-        }, */
-
-        series: [{
-            data: map_arr,
-            name: 'Weekly cases',
-            color: '#b3b3b3',
-            states: {                
-                hover: {
-                    color: '#cccccc',
-                    borderColor: 'red'
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                format: '{point.name}'
-            }
-        }]
-    });
-}
+        var chart = new google.visualization.GeoChart(document.getElementById('geochart-colors'));
+        chart.draw(data, options);
+      };
 
 function draw_average_cases(content) {
     var location_cases = {};
