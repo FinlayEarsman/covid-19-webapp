@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from clickhouse_driver import Client
 from dashboard.models import FAQModel
-from dashboard.forms import FAQForm
+from dashboard.forms import FAQForm, DeleteFAQForm
 from django.http import HttpResponse
 
 ch_client = Client("covid-database")
@@ -78,8 +78,9 @@ def admin_page(request):
     # populate_models()
 
     form = FAQForm()
+    delete_form = DeleteFAQForm()
     model_faqs = FAQModel.objects.all()
-    context = {'faqs': model_faqs, 'form': form}
+    context = {'faqs': model_faqs, 'form': form, 'delete_form': delete_form}
     return render(request, "admin-page.html", context)
 
 
@@ -95,6 +96,18 @@ def add_faq(request):
     return redirect(reverse('dashboard:admin_page'))
 
 
+def delete_faq(request, faq_slug):
+    if request.method == 'POST':
+        if 'slug' in request.POST:
+            try:
+                faq = FAQModel.objects.get(slug=faq_slug)
+                faq.delete()
+            except FAQModel.DoesNotExist:
+                redirect(reverse('dashboard:admin_page'))
+
+    return redirect(reverse('dashboard:admin_page'))
+
+
 def update_faq(request):
     if request.method == 'POST':
         if ("question" not in request.POST or
@@ -104,7 +117,7 @@ def update_faq(request):
         try:
             cur_faq = FAQModel.objects.get(slug=request.POST["slug"])
         except FAQModel.DoesNotExist:
-            return redirect(reverse('admin-page'))
+            return redirect(reverse('dashboard:admin_page'))
 
         updated_faq = {"question": request.POST["question"],
                        "answer": request.POST["answer"]}

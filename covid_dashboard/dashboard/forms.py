@@ -12,3 +12,11 @@ class FAQForm(forms.ModelForm):
     class Meta:
         model = FAQModel
         fields = ('question', 'answer', )
+
+
+class DeleteFAQForm(forms.ModelForm):
+    slug = forms.SlugField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = FAQModel
+        fields = ('slug', )

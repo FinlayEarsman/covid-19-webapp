@@ -27,6 +27,17 @@
                         <p>Update</p>
                     </button>
                 </td>
+                <form id ="delete_faq" method="post" action="{% url 'dashboard:delete_faq' faq.slug %}", enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for hidden in delete_form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    <td>
+                        <button type="submit" name="submit" id="delete_form">
+                            <p>Delete</p>
+                        </button>
+                    </td>
+                </form>
             </tr>
             {% endfor %}
             <tr>
@@ -37,7 +48,7 @@
                         <td>{{ field }}</td>
                     {% endfor %}
                     <td>
-                        <button type="submit" name="submit">
+                        <button type="submit" name="submit" id="faq_form">
                             <p>Add</p>
                         </button>
                     </td>

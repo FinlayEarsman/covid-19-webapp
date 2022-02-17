@@ -28,4 +28,5 @@ urlpatterns = [
     path('admin-page/', views.admin_page, name='admin_page'),
     path('update_faq/', views.update_faq, name='update_faq'),
     path('add_faq/', views.add_faq, name='add_faq'),
+    path('delete_faq/<slug:faq_slug>/', views.delete_faq, name='delete_faq'),
 ]
