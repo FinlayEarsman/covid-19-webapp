@@ -50,33 +50,7 @@ def get_summary_data(request):
                         json_dumps_params={"default": str})
 
 
-def populate_models():
-    faqs = [
-        {
-            "question": "This is question 1...",
-            "answer": "This is answer 1..."
-        },
-        {
-            "question": "This is question 2...",
-            "answer": "This is answer 2..."
-        },
-        {
-            "question": "This is question 3...",
-            "answer": "This is answer 3..."
-        }
-    ]
-
-    for faq in faqs:
-        f = FAQModel.objects.get_or_create(question=faq["question"])[0]
-        f.answer = faq["answer"]
-        f.save()
-
-
 def admin_page(request):
-    # To initially generate FAQs to test edit functionality.
-    # Call must be removed after first run.
-    # populate_models()
-
     form = FAQForm()
     delete_form = DeleteFAQForm()
     model_faqs = FAQModel.objects.all()
