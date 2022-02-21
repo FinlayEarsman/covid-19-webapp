@@ -51,100 +51,203 @@ function create_summary_table(summaryContent) {
     } );
 }
 
-function draw_map(content) {
-
-    var location_cases = {}
-
-    content.forEach((row) => {
-        var location_ = row[0];
-        var n_cases = row[2];
-
-        var cur_location = location_cases[location_];
-        if (cur_location === undefined) {
-            location_cases[location_] = {
-                name: location_,
-                data: [n_cases],
-            };
-        } else {
-            cur_location.data.push(n_cases)
-        }
-    });
-
-    // Dictionary from Highcharts hc-key mappings from country names
-    var convert = {'Uganda':'ug', 'Nigeria':'ng',
-        'Sao Tome and Principe':'st', 'Tanzania':'tz', 'Sierra Leone':'sl',
-        'Guinea-Bissau':'gw', 'Cape Verde':'cv', 'Seychelles':'sc',
-        'Tunisia':'tn', 'Madagascar':'mg', 'Kenya':'ke',
-        'Democratic Republic of Congo':'cd', 'France':'fr', 'Mauritania':'mr',
-        'Algeria':'dz', 'Eritrea':'er', 'Equatorial Guinea':'gq',
-        'Mauritius':'mu', 'Senegal':'sn', 'Comoros':'km',
-        'Ethiopia':'et', 'Cote d\'Ivoire':'ci', 'Ghana':'gh',
-        'Zambia':'zm', 'Namibia':'na', 'Rwanda':'rw',
-        'Somaliland':'sx', 'Somalia':'so', 'Cameroon':'cm',
-        'Congo':'cg', 'Western Sahara':'eh', 'Benin':'bj',
-        'Burkina Faso':'bf', 'Togo':'tg', 'Niger':'ne',
-        'Libya':'ly', 'Liberia':'lr', 'Malawi':'mw',
-        'Gambia':'gm', 'Chad':'td', 'Gabon':'ga',
-        'Djibouti':'dj', 'Burundi':'bi', 'Angola':'ao',
-        'Guinea':'gn', 'Zimbabwe':'zw', 'South Africa':'za',
-        'Mozambique':'mz', 'Eswatini':'sz', 'Mali':'ml',
-        'Botswana':'bw', 'Sudan':'sd', 'Morocco':'ma',
-        'Egypt':'eg', 'Lesotho':'ls', 'South Sudan':'ss',
-        'Central African Republic':'cf'
+let countries, population, mapChart, countryChart;
+const getConfig = e => ({
+    confirmed: {
+      day: 0,
+      header: "Confirmed Covid-19 Cases",
+      name: "Confirmed cases",
+      valueSuffix: "confirmed cases"
+    },
+    deaths: {
+      day: 0,
+      header: "Deaths caused by Covid-19",
+      name: "Deaths",
+      valueSuffix: "deaths"
     }
-
-    var map_arr = []
-    for (var key in location_cases) {
-        var hc_key = convert[key];
-        if (hc_key != undefined) {
-            var country = location_cases[key];
-            // For seeing all cases on map
-            var summed_cases = country.data.reduce((a, b) => a+b, 0);
-            // Finding cases in most recent week
-            var all_cases_arr = country.data;
-            var recent_week_cases = all_cases_arr[all_cases_arr.length-1];
-
-            if (recent_week_cases > 0 && recent_week_cases != null) {
-                map_arr.push([hc_key, recent_week_cases]);
-            } else {
-                map_arr.push([hc_key, 0]);
-            }
+  } [e]),
+  createMap = (e = "confirmed") => { 
+    const t = getConfig(e);
+    document.getElementById("map-header").innerHTML = t.header;
+    const a = Highcharts.geojson(Highcharts.maps["custom/africa"]),
+      o = {};
+    a.forEach((function(e) {
+      e.id = e.properties["hc-key"];
+      const t = population.find((t => e.properties["hc-key"].toUpperCase() === t.code));
+      o[e.name] = t && t.z || null
+    }));
+    let n = 0;
+    const r = Object.keys(countries).map((t => {
+      const a = countries[t],
+        r = a[a.length - 1][e];
+      if (o[t]) {
+        const e = r / o[t];
+        return o[t] > 1e3 && (n = Math.max(e, n)), {
+          name: t,
+          value: e,
+          total: r
         }
-    }
-
-    Highcharts.mapChart('choropleth', {
-        chart: {
-            map: 'custom/africa',
-            height: (9/16*100)+'%'
-        },
-
+      }
+      return {
+        name: t,
+        value: null
+      }
+    }));
+    mapChart || (mapChart = Highcharts.mapChart("container", {
+      chart: {
+        spacingLeft: 1,
+        spacingRight: 1
+      },
+      mapNavigation: {
+        enabled: !0,
+        buttonOptions: {
+          verticalAlign: "bottom"
+        }
+      },
+      colorAxis: {
+        minColor: "rgba(196, 0, 0, 0.1)",
+        maxColor: "rgba(196, 0, 0, 1)"
+      },
+      tooltip: {
+        headerFormat: "<b>{point.point.name}</b><br>",
+        footerFormat: '<span style="font-size: 10px">(Click for details)</span>'
+      },
+      legend: {
         title: {
-            text: 'Interactive Map'
+          text: "Per 1000 inhabitants",
+          style: {
+            fontWeight: "normal"
+          }
+        }
+      },
+      series: [{
+        id: "map",
+        mapData: a,
+        joinBy: ["name", "name"],
+        cursor: "pointer",
+        states: {
+          select: {
+            color: void 0,
+            borderColor: "#333"
+          }
         },
-
-        /* For when data is normalised
-        colorAxis: {
-            minColor: '#80ff80',
-            maxColor: '#ff8080'
-        }, */
-
-        series: [{
-            data: map_arr,
-            name: 'Weekly cases',
-            color: '#b3b3b3',
-            states: {                
-                hover: {
-                    color: '#cccccc',
-                    borderColor: 'red'
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                format: '{point.name}'
+        borderWidth: 1,
+        borderColor: "rgba(0, 0, 0, 0.05)"
+      }]
+    })), mapChart.update({
+      colorAxis: {
+        max: n
+      },
+      tooltip: {
+        pointFormat: "<b>{point.total}</b> " + t.valueSuffix + "<br><b>{point.value:.2f}</b> per 1000 inhabitants<br>"
+      },
+      series: [{
+        data: r,
+        name: t.name
+      }]
+    }, !0, !0);
+    const i = a => {
+      a && a.target && a.target.point && (a.preventDefault(), a.target.point.select(null, a.ctrlKey || a.metaKey || a.shiftKey || "touchstart" == a.type), a.target.point.selected && a.target.point.graphic.toFront());
+      const o = mapChart.getSelectedPoints();
+      if (o.length) {
+        a && a.type, 1 == o.length ? (document.querySelector("#info .header-text").style.paddingLeft = "40px", document.querySelector("#info .header-text").innerHTML = o[0].name, document.querySelector("#info .subheader").innerHTML = `${t.name}, starting the day of the ${t.day0Value}th case<br>`, a && "touchstart" === a.type ? document.querySelector("#info .subheader").innerHTML += "<small><em>Tap on map to compare multiple countries</em></small>" : document.querySelector("#info .subheader").innerHTML += "<small><em>Shift+Click on map to compare multiple countries</em></small>") : (document.querySelector("#info .header-text").style.paddingLeft = 0, document.querySelector("#info .header-text").innerHTML = "Comparing countries", document.querySelector("#info .subheader").innerHTML = `${t.name}, starting the day of the ${t.day0Value}th case<br>`), countryChart || (countryChart = Highcharts.chart("country-chart", {
+          chart: {
+            spacingLeft: 0
+          },
+          credits: {
+            enabled: !1
+          },
+          title: {
+            text: null
+          },
+          subtitle: {
+            text: null
+          },
+          xAxis: {
+            crosshair: !0,
+            allowDecimals: !1,
+            labels: {
+              format: "Day #{value}"
             }
-        }]
-    });
-}
+          },
+          yAxis: {
+            title: null,
+            opposite: !0
+          },
+          tooltip: {
+            headerFormat: "<small>{series.name}</small><br>"
+          },
+          legend: {
+            enabled: !1
+          },
+          plotOptions: {
+            series: {
+              animation: {
+                duration: 50
+              },
+              label: {
+                enabled: !0
+              },
+              marker: {
+                enabled: !1
+              },
+              threshold: 0
+            }
+          }
+        }));
+        const n = [],
+          r = o.filter((e => countries[e.name])).map((a => {
+            n.push(a.id);
+            const r = countries[a.name].findIndex((a => a[e] >= t.day0Value)),
+              i = countries[a.name].slice(Math.max(r - 1, 0)).map(((t, a) => {
+                const [o, n, r] = t.date.split("-");
+                return {
+                  date: Date.UTC(o, n - 1, r),
+                  x: a,
+                  y: t[e]
+                }
+              }));
+            return {
+              id: a.id,
+              name: a.name,
+              data: i,
+              type: o.length > 1 ? "line" : "area",
+              color: o.length > 1 ? void 0 : "#aa0000",
+              fillColor: o.length > 1 ? void 0 : a.color
+            }
+          }));
+        countryChart.update({
+          series: r,
+          tooltip: {
+            pointFormat: "<b>Day {point.x}: {point.date:%b %e, %Y}</b><br>{point.y} " + t.valueSuffix
+          }
+        }, !0, !0), location.hash = n.join(",")
+      } else document.querySelector("#info .header-text").innerHTML = "", document.querySelector("#info .subheader").innerHTML = "", countryChart && (countryChart = countryChart.destroy())
+    };
+    mapChart.container.querySelectorAll(".highcharts-point").forEach((e => {
+      e.addEventListener("click", i), e.addEventListener("touchstart", i)
+    })), selected.split(",").forEach((e => {
+      if (/^[a-z]{2}$/.test(e)) {
+        mapChart.get(e) && mapChart.get(e).select(!0, !0)
+      }
+    })), i()
+  },
+  activateButtons = () => {
+    const e = document.querySelectorAll('input[name="source"]');
+    e.forEach((t => {
+      t.addEventListener("click", (() => {
+        t.parentNode.classList.add("active"), e.forEach((e => {
+          e !== t && e.parentNode.classList.remove("active")
+        })), createMap(t.id)
+      }))
+    }))
+  };
+document.addEventListener("DOMContentLoaded", (async function() {
+  const e = await fetch("https://pomber.github.io/covid19/timeseries.json");
+  countries = await e.json();
+  const t = await fetch("https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/world-population.json");
+  population = await t.json(), activateButtons(), createMap()
+}));
 
 function draw_average_cases(content) {
 
