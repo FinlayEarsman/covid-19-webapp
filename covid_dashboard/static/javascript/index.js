@@ -55,15 +55,14 @@ let countries, population, mapChart, countryChart;
 const getConfig = e => ({
     confirmed: {
       day: 0,
-      header: "Confirmed Covid-19 Cases",
-      name: "Confirmed cases",
+      header: "<b>Confirmed Covid-19 Cases<b>",
+      name: "Confirmed Cases",
       valueSuffix: "confirmed cases"
     },
     deaths: {
       day: 0,
-      header: "Deaths caused by Covid-19",
-      name: "Deaths",
-      valueSuffix: "deaths"
+      header: "<b>Deaths caused by Covid-19<b>",
+      name: "Deaths", valueSuffix: "deaths"
     }
   } [e]),
   createMap = (e = "confirmed") => {
@@ -150,7 +149,14 @@ const getConfig = e => ({
       a && a.target && a.target.point && (a.preventDefault(), a.target.point.select(null, a.ctrlKey || a.metaKey || a.shiftKey || "touchstart" == a.type), a.target.point.selected && a.target.point.graphic.toFront());
       const o = mapChart.getSelectedPoints();
       if (o.length) {
-        a && a.type, 1 == o.length ? (document.querySelector("#info .header-text").style.paddingLeft = "40px", document.querySelector("#info .header-text").innerHTML = o[0].name, document.querySelector("#info .subheader").innerHTML = `${t.name}, starting the day of the ${t.day0Value}th case<br>`, a && "touchstart" === a.type ? document.querySelector("#info .subheader").innerHTML += "<small><em>Tap on map to compare multiple countries</em></small>" : document.querySelector("#info .subheader").innerHTML += "<small><em>Shift+Click on map to compare multiple countries</em></small>") : (document.querySelector("#info .header-text").style.paddingLeft = 0, document.querySelector("#info .header-text").innerHTML = "Comparing countries", document.querySelector("#info .subheader").innerHTML = `${t.name}, starting the day of the ${t.day0Value}th case<br>`), countryChart || (countryChart = Highcharts.chart("country-chart", {
+        a && a.type, 1 == o.length ? (
+            document.querySelector("#info .subheader").innerHTML = `${t.name} in <b>${o[0].name}</b><br>`,
+            a && "touchstart" === a.type ? document.querySelector("#info .subheader").innerHTML += "<small><em>Tap on the map to compare multiple countries</em></small>"
+                                         : document.querySelector("#info .subheader").innerHTML += "<small><em>Shift+Click on the map to compare multiple countries</em></small>"
+        ) : (
+            document.querySelector("#info .subheader").innerHTML = "Comparing Nations"
+        ),
+        countryChart || (countryChart = Highcharts.chart("country-chart", {
           chart: {
             spacingLeft: 0
           },
@@ -222,7 +228,9 @@ const getConfig = e => ({
             pointFormat: "<b>Day {point.x}: {point.date:%b %e, %Y}</b><br>{point.y} " + t.valueSuffix
           }
         }, !0, !0), location.hash = n.join(",")
-      } else document.querySelector("#info .header-text").innerHTML = "", document.querySelector("#info .subheader").innerHTML = "", countryChart && (countryChart = countryChart.destroy())
+      } else document.querySelector("#info .header-text").innerHTML = "",
+             document.querySelector("#info .subheader").innerHTML = "",
+             countryChart && (countryChart = countryChart.destroy())
     };
     mapChart.container.querySelectorAll(".highcharts-point").forEach((e => {
       e.addEventListener("click", i), e.addEventListener("touchstart", i)
