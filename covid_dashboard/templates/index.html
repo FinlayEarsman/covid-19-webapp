@@ -51,6 +51,10 @@
 
 </article>
 
+<article id="countries-vaccinations" class="graph">
+
+</article>
+
 <script>
 let summarydataRequest = new Request('{% url 'dashboard:get_summary_data' %}');
 const summaryRequest = fetch(summarydataRequest, {
@@ -84,6 +88,23 @@ const request = fetch(dataRequest, {
         }
     }
 );
+
+let vaccineDataRequest = new Request("{% url 'dashboard:get_vaccinated_percentage' %}");
+const vaccine_request = fetch(vaccineDataRequest, {
+        method: 'GET',
+        mode: 'same-origin',
+        cache: 'default'
+    }).then((response) => {
+        if (response.ok) {
+            response.json().then((content) => {
+                draw_countries_vaccinations(content);
+            });
+        } else {
+            console.log("Failed to retrieve COVID-19 data.");
+        }
+    }
+);
+
 </script>
 
 {% endblock %}
