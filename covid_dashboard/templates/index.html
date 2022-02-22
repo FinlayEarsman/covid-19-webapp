@@ -7,16 +7,8 @@
 
 {% block body_block %}
 
-<article id="choropleth" class="graph">
-
-</article>
-
-<table id="all-countries-table" class="table table-striped">
-
-</table>
-
+<article id="map">
 <div class="container-fluid">
-
   <div class="btn-group btn-group-toggle" style="margin-bottom: 1rem">
     <label class="btn btn-outline-primary active">
       <input type="radio" name="source" id="confirmed" autocomplete="off"> Confirmed Cases
@@ -37,19 +29,25 @@
       <div class="card">
         <div class="card-header">
           <span class="header-text"></span>
+          <b>Select a country to see its statistics</b>
         </div>
         <div class="card-header subheader">
-          Click on countries to see the data in a graphical form
         </div>
         <div class="card-body" id="country-chart">
-
         </div>
       </div>
     </div>
   </div>
+</div>
+</article>
+
 <article id="average-cases" class="graph">
 
 </article>
+
+<table id="all-countries-table" class="table table-striped">
+
+</table>
 
 <article id="countries-vaccinations" class="graph">
 
