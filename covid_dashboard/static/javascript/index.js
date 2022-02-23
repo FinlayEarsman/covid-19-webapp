@@ -213,8 +213,6 @@ for (var i=0; i < countries.length; i += 1) {
 }
 
 var layout = {
-    title: 'Average Number of New Cases per Week',
-    height: 600,
     xaxis: {
         showgrid: false,
         linecolor: 'black',
@@ -361,7 +359,6 @@ function draw_countries_vaccinations(content) {
 
     var layout = {
         barmode: 'group',
-        title: 'Vaccination Coverage by Country',
         height: 1000,
         legend: {'traceorder':'reversed'},
         grid: {
