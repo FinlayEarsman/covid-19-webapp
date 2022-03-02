@@ -253,8 +253,8 @@ var layout = {
     hoverlabel: {bgcolor: 'white'},
     legend: {text: 'country'},
 };
-
-Plotly.newPlot("average-cases", main_data, layout);
+var config = {responsive: true};
+Plotly.newPlot("average-cases", main_data, layout, config);
 };
 
 function draw_countries_vaccinations(content) {
@@ -413,8 +413,8 @@ function draw_countries_vaccinations(content) {
         hoverlabel: {bgcolor: 'white'},
         hovermode: 'closest'
     };
-
-    Plotly.newPlot("countries-vaccinations", main_data, layout);
+    var config = {responsive: true};
+    Plotly.newPlot("countries-vaccinations", main_data, layout, config);
 };
 
 
@@ -512,8 +512,8 @@ function draw_country_new_vaccinations(content) {
             hoverlabel: {bgcolor: 'white'},
             legend: {text: 'country'},
         };
-        
-        Plotly.newPlot("country-new-vaccinations", main_data, layout);
+        var config = {responsive: true};
+        Plotly.newPlot("country-new-vaccinations", main_data, layout, config);
     };
 
     // Drop-down button from https://plotly.com/javascript/dropdowns/
