@@ -7,9 +7,12 @@
 
 {% block body_block %}
 
-<article id="choropleth" class="graph">
-
-</article>
+<div class="graph-wrapper">
+    <div class="graph-head">Interactive Map</div>
+    <div class="graph-body">
+        <article id="choropleth" class="graph"></article>
+    </div>
+</div>
 
 <div class="weekly-update-container">
     <div class="box">
@@ -38,8 +41,12 @@
     </div>
 </div>
 
-    
+<div class="table-wrapper">
+<div class="table-head">Summary Table</div>
+<div class="table-body">
 <table id="all-countries-table" class="table table-striped"></table>
+</div>
+</div>
 
 <div class="graph-wrapper">
     <div class="graph-head">Average Number of New Cases per Week</div>

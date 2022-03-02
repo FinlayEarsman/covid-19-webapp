@@ -2,6 +2,10 @@
 function create_summary_table(summaryContent) {
     var dataset = summaryContent;
     $('#all-countries-table').DataTable( {
+        language: {
+            searchPlaceholder: "Search table...",
+            search: "",
+        },
         "scrollY":        "250px",
         "scrollCollapse": true,
         "paging":         false,
@@ -135,9 +139,7 @@ function draw_map(content) {
             height: (9/16*100)+'%'
         },
 
-        title: {
-            text: 'Interactive Map'
-        },
+        title:false,
 
         /* For when data is normalised
         colorAxis: {
@@ -213,6 +215,13 @@ for (var i=0; i < countries.length; i += 1) {
 }
 
 var layout = {
+    margin: {
+        l: 50,
+        r: 20,
+        t: 20,
+        b: 50,
+        pad: 0
+    },
     xaxis: {
         showgrid: false,
         linecolor: 'black',
@@ -358,6 +367,13 @@ function draw_countries_vaccinations(content) {
     }
 
     var layout = {
+        margin: {
+            l: 50,
+            r: 20,
+            t: 20,
+            b: 50,
+            pad: 0
+        },
         barmode: 'group',
         height: 1000,
         legend: {'traceorder':'reversed'},
@@ -470,6 +486,13 @@ function draw_country_new_vaccinations(content) {
         main_data.push(data)
         
         var layout = {
+            margin: {
+				l: 50,
+				r: 20,
+				t: 20,
+				b: 50,
+				pad: 0
+	        },
             height: 600,
             xaxis: {
                 showgrid: false,
