@@ -1,12 +1,5 @@
-.navigation a {
-    color: black;
-    font-style: italic;
-    font-weight: bold;
-    text-decoration: none;
+.navigation li {
     padding: 5px 15px;
-    display: inline-block;
-    width: 100%;
-    text-align: center;
 }
 
 .navigation a:hover {
@@ -14,8 +7,19 @@
 }
 
 .navigation {
+    color: black;
+    font-weight: bold;
+    font-style: italic;
     margin-top: 0;
+    z-index: 3000;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
+}
+
+.navigation a {
+    color: black;
 }
 
 .navigation ul {
@@ -27,5 +31,10 @@
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: space-between;
+}
+
+main {
+    padding-top: 40px;
 }

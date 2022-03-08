@@ -67,8 +67,8 @@
 }
 
 .box {
-    width: 200px;
-    height: 200px;
+    width: 190px;
+    min-height: 200px;
     position: relative;
     background-color: #f0f0f0;
     padding: 20px;
@@ -89,7 +89,7 @@
 
 .box-head {
     position: absolute;
-    height: 21%;
+    min-height: 19%;
     padding: 0px;
     width: 100%;
     top: 0px;
@@ -102,7 +102,7 @@
 .box-body {
     display:flex; 
     flex-direction:column;
-    padding-block: 15%;
+    margin-top: 20%;
 }
 
 .weekly-table {

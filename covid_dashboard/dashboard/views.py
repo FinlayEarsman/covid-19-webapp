@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from clickhouse_driver import Client
 
@@ -16,7 +16,7 @@ def get_covid_data(request):
         SELECT
             Location,
             toStartOfWeek(UpdateDate) AS Week,
-            ceil(avg(NewCases)) AS AvgNewCases
+            CEIL(AVG(NewCasesPerMil)/ 10) AS NewCasesPer100K
         FROM covid19.updates
         WHERE Continent='Africa'
         GROUP BY
@@ -32,12 +32,16 @@ def get_summary_data(request):
     results = get_db_conn().execute("""
         SELECT
             Location,
-            MAX(TotalCases) AS Cases,
-            ceil(avg(NewCasesPerMil)) AS NewCases,
+            CEIL(MAX(Population) / 100000) AS PopulationPer100kQuotient,
+            MAX(TotalCases) AS TotalCases,
+            CEIL(TotalCases / PopulationPer100kQuotient) AS CasesPer100k,
+            CEIL(AVG(NewCasesPerMil) / 10) AS NewCases,
             MAX(TotalDeaths) AS TotalDeaths,
-            ceil(avg(NewDeathsPerMil)) AS NewDeaths,
-            MAX(TotalVaccinations) AS Vaccinations,
-            ceil(avg(NewVaccinationsSmoothPerMil)) AS NewVaccinations
+            CEIL(TotalDeaths / PopulationPer100kQuotient) AS DeathsPer100k,
+            CEIL(AVG(NewDeathsPerMil) / 10) AS NewDeaths,
+            MAX(TotalVaccinations) AS TotalVaccinations,
+            CEIL(TotalVaccinations / PopulationPer100kQuotient) AS VaccPer100k,
+            CEIL(AVG(NewVaccinationsSmoothPerMil) / 10) AS NewVaccinations
         FROM covid19.updates
         WHERE
             Continent='Africa' AND UpdateDate>=today() - 7
@@ -57,9 +61,9 @@ def get_vaccinated_percentage(request):
             MAX(PeopleFullyVaccinated) AS FullyVaccinated,
             MAX(TotalBoosters) AS BoosterVaccine,
             MAX(Population) AS Population,
-            ceil(FirstVaccine / Population * 100) AS PercentOneDose,
-            ceil(FullyVaccinated / Population * 100) AS PercentTwoDose,
-            ceil(BoosterVaccine / Population * 100) AS PercentThreeDose
+            CEIL(FirstVaccine / Population * 100) AS PercentOneDose,
+            CEIL(FullyVaccinated / Population * 100) AS PercentTwoDose,
+            CEIL(BoosterVaccine / Population * 100) AS PercentThreeDose
         FROM covid19.updates
         WHERE Continent='Africa'
         GROUP BY
@@ -71,31 +75,36 @@ def get_vaccinated_percentage(request):
 
 
 def get_weekly_maxs(request):
-    results = get_db_conn().execute("""
+    cases_results = get_db_conn().execute("""
         (SELECT TOP 5
             Location,
-            ceil(AVG(NewCasesPerMil)) AS newCases
+            CEIL(AVG(NewCasesPerMil) / 10) AS newCases
         FROM covid19.updates
         WHERE Continent='Africa' AND UpdateDate>=today() - 7
         GROUP BY Location
         ORDER BY newCases DESC)
-        UNION ALL
-        (SELECT TOP 5
-            Location,
-            ceil(AVG(NewDeathsPerMil)) AS newDeaths
-        FROM covid19.updates
-        WHERE Continent='Africa' AND UpdateDate>=today() - 7
-        GROUP BY Location
-        ORDER BY newDeaths DESC)
-        UNION ALL
-        (SELECT TOP 5
-            Location,
-            ceil(AVG(NewVaccinationsSmoothPerMil)) AS newVacc
-        FROM covid19.updates
-        WHERE Continent='Africa' AND UpdateDate>=today() - 7
-        GROUP BY Location
-        ORDER BY newVacc DESC)
     """)
+
+    deaths_results = get_db_conn().execute("""
+        SELECT TOP 5
+            Location,
+            CEIL(AVG(NewDeathsPerMil) / 10) AS newDeaths
+        FROM covid19.updates
+        WHERE Continent='Africa' AND UpdateDate>=today() - 7
+        GROUP BY Location
+        ORDER BY newDeaths DESC
+    """)
+
+    vacc_results = get_db_conn().execute("""
+        SELECT TOP 5
+            Location,
+            CEIL(AVG(NewVaccinationsSmoothPerMil) / 10) AS newVacc
+        FROM covid19.updates
+        WHERE Continent='Africa' AND UpdateDate>=today() - 7
+        GROUP BY Location
+        ORDER BY newVacc DESC
+    """)
+    results = [cases_results, deaths_results, vacc_results]
     return JsonResponse(results, safe=False,
                         json_dumps_params={"default": str})
 
@@ -105,8 +114,10 @@ def get_new_vaccinated_data(request):
         SELECT
             Location,
             toStartOfWeek(UpdateDate) AS Week,
-            ceil(sum(NewVaccinationsSmoothPerMil)) AS NewVaccinations,
-            ceil(NewVaccinations / 10) AS NewVaccinationsPerHun
+            CEIL(SUM(NewVaccinationsSmoothPerMil)/ 10)
+            AS NewVaccinationsPer100k,
+            ceil(AVG(NewVaccinationsSmoothPerMil) / 10)
+            AS AvgNewVaccinationsPer100k
         FROM covid19.updates
         WHERE Continent='Africa'
         GROUP BY
@@ -116,3 +127,10 @@ def get_new_vaccinated_data(request):
     """)
     return JsonResponse(results, safe=False,
                         json_dumps_params={"default": str})
+
+
+def get_last_update(request):
+    results = get_db_conn().execute(
+        "SELECT MAX(UpdateDate) FROM covid19.updates"
+    )
+    return HttpResponse(results[0])

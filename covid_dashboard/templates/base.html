@@ -62,21 +62,34 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KSNRX24"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+
     <nav class="navigation">
         <ul>
-            <li><a href="#">Top of Page</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Sources</a></li>
-            <li><a href="#">Donate</a></li>
+            <li><a href="#top">Top of Page</a></li>
+            <li id=last-updated-field>Last Updated: pending</li>
         </ul>
     </nav>
-    <main>
+    <main id="top">
         {% block body_block %}
             Hello, World!
         {% endblock %}
     </main>
 
+    <script>
+    fetch("{% url 'dashboard:get_last_update' %}", {
+        method: 'GET',
+        mode: 'same-origin',
+        cache: 'default',
+    }).then((response) => {
+        if (response.ok) {
+            response.text().then((update) => {
+                document.getElementById('last-updated-field').innerText = "Last Update: " + update;
+            });
+        } else {
+            document.getElementById('last-updated-field').innerText = "Last Update: Failed to get date.";
+        }
+    });
+    </script>
     <footer>
         <p>Walt Anderson with collaboration with CS21</p>
     </footer>

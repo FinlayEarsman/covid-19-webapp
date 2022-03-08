@@ -10,7 +10,7 @@ DATASET=/var/lib/harvester/dataset
 echo "Obtaining date of latest update from $SERVER"
 
 LAST_UPDATE=$(clickhouse client -h "$SERVER" \
-    --query="SELECT UpdateDate FROM covid19.latest LIMIT 1") || exit 1
+    --query="SELECT MAX(UpdateDate) FROM covid19.updates") || exit 1
 [ -z "$LAST_UPDATE" ] && LAST_UPDATE="NO_PREVIOUS_DATA"
 
 echo "Last update: $LAST_UPDATE"

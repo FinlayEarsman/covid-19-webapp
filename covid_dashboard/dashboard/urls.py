@@ -28,4 +28,5 @@ urlpatterns = [
     path('weekly_max_data/', views.get_weekly_maxs, name='get_weekly_maxs'),
     path('new_vaccinated_data/', views.get_new_vaccinated_data,
          name='get_new_vaccinated_data'),
+    path('last_update/', views.get_last_update, name='get_last_update'),
 ]

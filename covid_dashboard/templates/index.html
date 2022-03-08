@@ -7,14 +7,14 @@
 
 {% block body_block %}
 
-<div class="graph-wrapper">
+<div id="interactive-map" class="graph-wrapper">
     <div class="graph-head">Interactive Map</div>
     <div class="graph-body">
         <article id="choropleth" class="graph"></article>
     </div>
 </div>
 
-<div class="weekly-update-container">
+<div id="top-increases" class="weekly-update-container">
     <div class="box">
       <div class="box-head">Largest Case Increase This Week</div>
       <div class="box-body">
@@ -41,36 +41,35 @@
     </div>
 </div>
 
-<div class="table-wrapper">
+<div id="data-table" class="table-wrapper">
 <div class="table-head">Summary Table</div>
 <div class="table-body">
 <table id="all-countries-table" class="table table-striped"></table>
 </div>
 </div>
 
-<div class="graph-wrapper">
+<div id="cases-linegraph" class="graph-wrapper">
     <div class="graph-head">Average Number of New Cases per Week</div>
     <div class="graph-body">
         <article id="average-cases" class="graph"></article>
     </div>
 </div>
 
-<div class="graph-wrapper">
+<div id="vaccination-coverage" class="graph-wrapper">
     <div class="graph-head">Vaccination Coverage by Country</div>
     <div class="graph-body">
         <article id="countries-vaccinations" class="graph"></article>
     </div>
 </div>
 
-    <div id="weekly-vaccines" class="graph-wrapper">
-        <div class="graph-head">Number of New Vaccinations per Week (per 100k)</div>
-        <div class="graph-body">
-            <div class="dropdown-button">
-                Use drop-down menu to view a country's administered vaccinations:
-                <select class="countryChoice"></select>
-            </div>
-            <article id="country-new-vaccinations" class="graph"></article>
+<div id="weekly-vaccines" class="graph-wrapper">
+    <div class="graph-head">Number of New Vaccinations per Week (per 100k)</div>
+    <div class="graph-body">
+        <div class="dropdown-button">
+            Use drop-down menu to view a country's administered vaccinations:
+            <select class="countryChoice"></select>
         </div>
+        <article id="country-new-vaccinations" class="graph"></article>
     </div>
 </div>
 
