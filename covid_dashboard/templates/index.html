@@ -85,6 +85,19 @@
         display data values.</p></div>
 </div>
 
+<div id="comparison-linegraph" class="graph-wrapper">
+    <div class="graph-head">Country Wise Important Data</div>
+    <div class="graph-body">
+        <div class="dropdown-button">
+            Use drop-down menu to view a country's figures:
+            <select class="countryChoice"></select>
+        </div>
+        <article id="country-statistics" class="graph"></article>
+    </div>
+    <div class="description"><p>Hover over lines to display the data values. Select a country to view using the drop-down box. Hover over the lines to 
+        display data values for each of the statistics. </p></div>
+</div>
+
 <script>
 let mapRequest = new Request("{% url 'dashboard:get_map_data' %}");
 const request_mapData = fetch(mapRequest, {
@@ -181,6 +194,23 @@ const weekly_vaccine_request = fetch(weeklyVaccinationDataRequest, {
         }
     }
 );
+
+let countryDataRequest = new Request("{% url 'dashboard:get_country_data' %}");
+const country_data_request = fetch(countryDataRequest, {
+        method: 'GET',
+        mode: 'same-origin',
+        cache: 'default'
+    }).then((response) => {
+        if (response.ok) {
+            response.json().then((content) => {
+                draw_country_data(content);
+            });
+        } else {
+            console.log("Failed to retrieve COVID-19 data.");
+        }
+    }
+);
+
 </script>
 
 {% endblock %}
