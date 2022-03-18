@@ -168,6 +168,27 @@ def get_new_deaths_data(request):
                         json_dumps_params={"default": str})
 
 
+def get_new_tests_data(request):
+    results = get_db_conn().execute("""
+        SELECT
+            Location,
+            toStartOfWeek(UpdateDate) AS Week,
+            CEIL(MAX(Population)/100000) AS PopulationPer100KQuotient,
+            CEIL(SUM(NewTests / PopulationPer100KQuotient))
+            AS NewTestsPer100K,
+            CEIL(AVG(NewTests) / PopulationPer100KQuotient)
+            AS AvgNewTestsPer100k
+        FROM covid19.updates
+        WHERE Continent='Africa'
+        GROUP BY
+            Location,
+            Week
+        ORDER BY Week ASC;
+    """)
+    return JsonResponse(results, safe=False,
+                        json_dumps_params={"default": str})
+
+
 def get_last_update(request):
     results = get_db_conn().execute(
         "SELECT MAX(UpdateDate) FROM covid19.updates"
