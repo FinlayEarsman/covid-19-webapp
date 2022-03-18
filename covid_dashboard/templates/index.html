@@ -98,6 +98,19 @@
         display the data values.</p></div>
 </div>
 
+<div id="weekly-tests" class="graph-wrapper">
+    <div class="graph-head">Number of New Tests per Week (per 100k)</div>
+    <div class="graph-body">
+        <div class="dropdown-button">
+            Use drop-down menu to view a country's reported tests:
+            <select class="countryChoice"></select>
+        </div>
+        <article id="country-new-tests" class="graph"></article>
+    </div>
+    <div class="description"><p>Select a country to view using the drop-down box. Hover over bars to 
+        display the data values.</p></div>
+</div>
+
 <script>
 let mapRequest = new Request("{% url 'dashboard:get_map_data' %}");
 const request_mapData = fetch(mapRequest, {
@@ -204,6 +217,22 @@ const weekly_deaths_request = fetch(weeklyDeathsDataRequest, {
         if (response.ok) {
             response.json().then((content) => {
                 draw_country_new_deaths(content);
+            });
+        } else {
+            console.log("Failed to retrieve COVID-19 data.");
+        }
+    }
+);
+
+let weeklyTestsDataRequest = new Request("{% url 'dashboard:get_new_tests_data' %}");
+const weekly_tests_request = fetch(weeklyTestsDataRequest, {
+        method: 'GET',
+        mode: 'same-origin',
+        cache: 'default'
+    }).then((response) => {
+        if (response.ok) {
+            response.json().then((content) => {
+                draw_country_new_tests(content);
             });
         } else {
             console.log("Failed to retrieve COVID-19 data.");
