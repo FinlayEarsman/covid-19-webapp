@@ -769,6 +769,144 @@ async function draw_country_new_deaths(content) {
 };
 
 
+async function draw_country_new_tests(content) {
+
+    var location_tests = {};
+    var dates = [];
+    var last_date = undefined;
+    
+    content.forEach((row) => {
+        var location_ = row[0];
+        var datestamp = row[1];
+        var n_tests = row[2];
+        var n_avg_tests = row[3];
+    
+        var cur_location = location_tests[location_];
+        if (cur_location === undefined) {
+            location_tests[location_] = {
+                name: location_,
+                tests_data: [n_tests],
+                avg_tests_data: [n_avg_tests],
+                date_recorded: [datestamp]
+            };
+        } else {
+            cur_location.tests_data.push(n_tests);
+            cur_location.avg_tests_data.push(n_avg_tests);
+            cur_location.date_recorded.push(datestamp);
+        }
+    
+        if (datestamp != last_date) {
+            last_date = datestamp;
+            dates.push(datestamp);
+        }
+    });
+
+    var start_graph_date = await start_date_of_graph(last_date);
+
+    // Default Country Data for countries ordered alphabetically
+    setPlot('Algeria')
+
+    function setPlot(countryName) {
+
+        var main_data = [];
+        var country = countryName
+        var xValues = location_tests[country].date_recorded;
+        var yValues = location_tests[country].tests_data;
+        var avgValues = location_tests[country].avg_tests_data;
+    
+        var data = {
+            type: 'scatter',
+            name: country,
+            meta: [country],
+            x: xValues,
+            y: yValues,
+            mode: 'lines',
+            customdata: avgValues,
+            hovertemplate: '%{x}' + 
+                            '<br><b>%{meta[0]}:</b> %{y} tests<br>' +
+                            '7-day average: %{customdata} <extra></extra>'
+        };
+    
+        main_data.push(data)
+        
+        var layout = {
+            margin: {
+				l: 50,
+				r: 20,
+				t: 20,
+				b: 50,
+				pad: 0
+	        },
+            height: 600,
+            xaxis: {
+                fixedrange: true,
+                showgrid: false,
+                linecolor: 'black',
+                range: [start_graph_date, last_date],
+                rangeselector: {buttons: [
+                    {
+                        count: 1,
+                        label: '1m',
+                        step: 'month',
+                        stepmode: 'backward'
+                    },
+                    {
+                        count: 3,
+                        label: '3m',
+                        step: 'month',
+                        stepmode: 'backward'
+                    },
+                    {
+                        count: 6,
+                        label: '6m',
+                        step: 'month',
+                        stepmode: 'backward'
+                    },
+                    {
+                        count: 1,
+                        label: '1y',
+                        step: 'year',
+                        stepmode: 'backward'
+                    },
+                    {
+                        step: 'all'
+                    }
+                ]}
+            },
+            yaxis: {
+                title: {text: 'Number of New Tests'},
+                fixedrange: true
+            },
+            hovermode: 'closest',
+            hoverlabel: {bgcolor: 'grey'},
+            legend: {text: 'country'},
+        };
+        var config = {responsive: true};
+        Plotly.newPlot("country-new-tests", main_data, layout, config);
+    };
+
+   
+    var weeklyTestsContainer = document.querySelector('#weekly-tests'),
+        countrySelector = weeklyTestsContainer.querySelector('.countryChoice');
+
+    var listofCountries = Object.keys(location_tests);
+    listofCountries.sort();
+    assignOptions(listofCountries, countrySelector);
+    countrySelector.addEventListener('change', updateCountry, false);
+    
+    function assignOptions(textArray, selector) {
+        for (var i = 0; i < textArray.length; i++) {
+            var currentOption = document.createElement('option');
+            currentOption.text = textArray[i];
+            selector.appendChild(currentOption);
+        }
+    }
+    
+    function updateCountry() {
+        setPlot(countrySelector.value);
+    }
+};
+
 function start_date_of_graph(last_date) {
     // Gets a date 6 months before last_date, to be used for start of xaxis.
     // Plotly does not allow presetting to the 6m range button, but we can set
