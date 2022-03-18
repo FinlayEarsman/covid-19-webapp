@@ -630,6 +630,215 @@ async function draw_country_new_vaccinations(content) {
     }
 };
 
+async function draw_country_data(content) {
+
+var location_cases = {};
+var location_deaths = {};
+var location_tests = {};
+var location_hospitilisations = {};
+var dates = [];
+var last_date = undefined;
+
+content.forEach((row) => {
+    var location_ = row[0];
+    var datestamp = row[1];
+    var n_cases = row[2];
+		var n_deaths = row[3];
+		var n_tests = row[4];
+		var n_hospitilisations = row[5];
+	
+    var cur_location = location_cases[location_];
+    if (cur_location === undefined) {
+        location_cases[location_] = {
+            name: location_,
+            data: [n_cases],
+            date_recorded: [datestamp]
+        };
+    } else {
+        cur_location.data.push(n_cases);
+        cur_location.date_recorded.push(datestamp);
+    }
+	
+	
+	var cur_location = location_deaths[location_];
+    if (cur_location === undefined) {
+        location_deaths[location_] = {
+            name: location_,
+            data: [n_deaths],
+            date_recorded: [datestamp]
+        };
+    } else {
+        cur_location.data.push(n_deaths);
+        cur_location.date_recorded.push(datestamp);
+    }
+
+	var cur_location = location_tests[location_];
+    if (cur_location === undefined) {
+        location_tests[location_] = {
+            name: location_,
+            data: [n_tests],
+            date_recorded: [datestamp]
+        };
+    } else {
+        cur_location.data.push(n_tests);
+        cur_location.date_recorded.push(datestamp);
+    }
+	
+	var cur_location = location_hospitilisations[location_];
+    if (cur_location === undefined) {
+        location_hospitilisations[location_] = {
+            name: location_,
+            data: [n_hospitilisations],
+            date_recorded: [datestamp]
+        };
+    } else {
+        cur_location.data.push(n_hospitilisations);
+        cur_location.date_recorded.push(datestamp);
+    }
+	if (datestamp != last_date) {
+            last_date = datestamp;
+            dates.push(datestamp);
+    };
+   });
+    var start_graph_date = await start_date_of_graph(last_date);
+    setPlot('Algeria')
+
+ function setPlot(countryName){	
+    main_data = []
+    var country = countryName
+    var country_names = Object.keys(location_cases);
+	var country_names = Object.keys(location_tests);
+	var country_names = Object.keys(location_deaths);
+	var country_names = Object.keys(location_hospitilisations);
+	
+    for (var i=country_names.length-1; i >= 0; i -= 1) {
+        var country = country_names[i]
+        var cases_graph = location_cases[country].n_cases
+        var tests_graph = location_tests[country].n_tests
+        var deaths_graph = location_deaths[country].n_deaths
+				var hospitilisations_graph = location_hospitilisations[country].n_hospitilisations
+
+    var cases_data = [{
+        type: 'scatter',
+        name: country,
+        meta: [country],
+        x: location_cases[country].date_recorded,
+        y: cases_graph,
+        mode: 'lines',
+        hovertemplate: '%{x} <br> %{meta[0]}: %{y} cases <extra></extra>'
+    }];
+	
+	var tests_data = [{
+        type: 'scatter',
+        name: country,
+        meta: [country],
+        x: location_tests[country].date_recorded,
+        y: tests_graph,
+        mode: 'lines',
+        hovertemplate: '%{x} <br> %{meta[0]}: %{y} tests <extra></extra>'
+    }];
+	
+	var deaths_data = [{
+        type: 'scatter',
+        name: country,
+        meta: [country],
+        x: location_deaths[country].date_recorded,
+        y: deaths_graph,
+        mode: 'lines',
+        hovertemplate: '%{x} <br> %{meta[0]}: %{y} deaths <extra></extra>'
+    }];
+	
+	var hospitilisations_data = [{
+        type: 'scatter',
+        name: country,
+        meta: [country],
+        x: location_hospitilisations[country].date_recorded,
+        y: hospitilisations_graph,
+        mode: 'lines',
+        hovertemplate: '%{x} <br> %{meta[0]}: %{y} hospitilisations <extra></extra>'
+    }];
+        main_data.push(cases_data)
+        main_data.push(tests_data)
+        main_data.push(deaths_data)
+				main_data.push(hospitilisations_data)
+  
+var layout = {
+    margin: {
+        l: 50,
+        r: 20,
+        t: 20,
+        b: 50,
+        pad: 0
+    },
+    xaxis: {
+        fixedrange: true,
+        showgrid: false,
+        linecolor: 'black',
+        range: [start_graph_date, last_date],
+        rangeselector: {buttons: [
+            {
+                count: 1,
+                label: '1m',
+                step: 'month',
+                stepmode: 'backward'
+            },
+            {
+                count: 3,
+                label: '3m',
+                step: 'month',
+                stepmode: 'backward'
+            },
+            {
+                count: 6,
+                label: '6m',
+                step: 'month',
+                stepmode: 'backward'
+            },
+            {
+                count: 1,
+                label: '1y',
+                step: 'year',
+                stepmode: 'backward'
+            },
+            {
+                step: 'all'
+            }
+        ]}
+    },
+    yaxis: {
+        title: {text: 'Compartive Graph for Key Statisitics for A Country'},
+        fixedrange: true
+    },
+    hovermode: 'closest',
+    hoverlabel: {bgcolor: 'white'},
+    legend: {text: 'country'},
+};
+var config = {responsive: true};
+Plotly.newPlot("country-statistics", main_data, layout, config);
+};
+
+    
+var CountryDataContainer = document.querySelector('#country-data'),
+        countrySelector = CountryDataContainer.querySelector('.countryChoice');
+
+    var listofCountries = Object.keys(location_cases);
+    listofCountries.sort();
+    assignOptions(listofCountries, countrySelector);
+    countrySelector.addEventListener('change', updateCountry, false);
+    
+    function assignOptions(textArray, selector) {
+        for (var i = 0; i < textArray.length; i++) {
+            var currentOption = document.createElement('option');
+            currentOption.text = textArray[i];
+            selector.appendChild(currentOption);
+        }
+    }
+    
+    function updateCountry() {
+        setPlot(countrySelector.value);
+    }}
+};
+
 function start_date_of_graph(last_date) {
     // Gets a date 6 months before last_date, to be used for start of xaxis.
     // Plotly does not allow presetting to the 6m range button, but we can set
