@@ -174,7 +174,7 @@ def get_new_tests_data(request):
             Location,
             toStartOfWeek(UpdateDate) AS Week,
             CEIL(MAX(Population)/100000) AS PopulationPer100KQuotient,
-            CEIL(SUM(NewTests / PopulationPer100KQuotient))
+            CEIL(MAX(NewTests / PopulationPer100KQuotient))
             AS NewTestsPer100K,
             CEIL(AVG(NewTests) / PopulationPer100KQuotient)
             AS AvgNewTestsPer100k
