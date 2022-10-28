@@ -1,8 +1,5 @@
 # Insitute of Biodiversity, Animal Health & Comparative Medicine
-A website to display up-to-date Covid-19 data across Africa with interactive graphs showcasing recent and long-term trends. \
-Live website found at following URLs:
-- [covid-africa.com](https://covid-africa.com)
-- [covid-africa.info](https://covid-africa.info)
+A website to display up-to-date Covid-19 data across Africa with interactive graphs showcasing recent and long-term trends. 
 
 
 ## Description
